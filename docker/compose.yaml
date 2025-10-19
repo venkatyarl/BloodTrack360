@@ -1,9 +1,20 @@
 services:
   postgres:
-    image: 'postgres:latest'
+    image: postgres:latest
+    container_name: bt_postgres
+    restart: unless-stopped
     environment:
-      - 'POSTGRES_DB=mydatabase'
-      - 'POSTGRES_PASSWORD=secret'
-      - 'POSTGRES_USER=myuser'
+      POSTGRES_DB: ${BT_DB:-bloodtrack}
+      POSTGRES_USER: ${BT_USER:-bt_user}
+      POSTGRES_PASSWORD: ${BT_PASSWORD:-bt_pass}
     ports:
-      - '5432'
+      - "${BT_DB_PORT:-5432}:5432"
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${BT_USER:-bt_user} -d ${BT_DB:-bloodtrack}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+    volumes:
+      - bt_pgdata:/var/lib/postgresql/data
+volumes:
+  bt_pgdata:
