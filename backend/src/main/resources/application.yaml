@@ -1,1 +1,35 @@
-spring.application.name=BloodTrackBackend
+spring:
+  application:
+    name: BloodTrackBackend
+  docker:
+    compose:
+      enabled: false
+  # --- Reactive DB (R2DBC) ---
+  r2dbc:
+    url: r2dbc:postgresql://localhost:5432/bloodtrack
+    username: bt_user
+    password: bt_pass
+    pool:
+      initial-size: 2
+      max-size: 10
+      max-idle-time: 30m
+  # --- Flyway (uses JDBC driver) ---
+  flyway:
+    url: jdbc:postgresql://localhost:5432/bloodtrack
+    user: bt_user
+    password: bt_pass
+    locations: classpath:db/migration
+    baseline-on-migrate: true
+
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info
+  endpoint:
+    health:
+      probes:
+        enabled: true
